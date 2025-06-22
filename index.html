@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Timestamp Microservice</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2em; }
+    input, button { font-size: 1em; padding: 0.5em; }
+    #result { margin-top: 1em; }
+  </style>
+</head>
+<body>
+  <h1>Timestamp Microservice</h1>
+  <p>Enter a date (YYYY-MM-DD) or a Unix timestamp:</p>
+  <input type="text" id="dateInput" placeholder="2015-12-25 or 1451001600000">
+  <button onclick="fetchTimestamp()">Get Timestamp</button>
+  <div id="result"></div>
+  <script>
+    function fetchTimestamp() {
+      const input = document.getElementById('dateInput').value.trim();
+      const url = input ? `/api/${encodeURIComponent(input)}` : '/api';
+      fetch(url)
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById('result').textContent = JSON.stringify(data);
+        })
+        .catch(err => {
+          document.getElementById('result').textContent = 'Error: ' + err;
+        });
+    }
+  </script>
+  <p>Example Usage:</p>
+  <ul>
+    <li><code>/api/2015-12-25</code></li>
+    <li><code>/api/1451001600000</code></li>
+  </ul>
+  <p>Example Output:</p>
+  <pre>{"unix":1451001600000, "utc":"Fri, 25 Dec 2015 00:00:00 GMT"}</pre>
+  <footer style="margin-top:2em; color:#888;">By freeCodeCamp.org</footer>
+</body>
+</html>
