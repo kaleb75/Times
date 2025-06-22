@@ -1,6 +1,9 @@
-// Basic Timestamp Microservice using Express
 const express = require("express");
 const app = express();
+
+app.get("/", (req, res) => {
+  res.send("Timestamp Microservice. Use /api/:date or /api for current time.");
+});
 
 app.get("/api", (req, res) => {
   const date = new Date();
@@ -11,34 +14,32 @@ app.get("/api", (req, res) => {
 });
 
 app.get("/api/:date", (req, res) => {
-  let dateString = req.params.date;
-  let date;
+  let { date } = req.params;
+  let parsedDate;
 
-  if (/^\d+$/.test(dateString)) {
-    // If only digits, treat as unix timestamp (milliseconds or seconds)
-    date = new Date(
-      dateString.length <= 10
-        ? parseInt(dateString) * 1000
-        : parseInt(dateString)
+  // Remove spaces and handle both string and number
+  date = date.trim();
+
+  if (/^-?\d+$/.test(date)) {
+    // If length is 13, treat as ms, if 10 as seconds
+    parsedDate = new Date(
+      date.length === 13 ? Number(date) : Number(date) * 1000
     );
   } else {
-    date = new Date(dateString);
+    parsedDate = new Date(date);
   }
 
-  if (date.toString() === "Invalid Date") {
+  if (parsedDate.toString() === "Invalid Date") {
     return res.json({ error: "Invalid Date" });
   }
 
   res.json({
-    unix: date.getTime(),
-    utc: date.toUTCString(),
+    unix: parsedDate.getTime(),
+    utc: parsedDate.toUTCString(),
   });
 });
 
-app.get("/", (req, res) => {
-  res.send("Timestamp Microservice is running. Use /api/:date?");
-});
-
+// Start the server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
